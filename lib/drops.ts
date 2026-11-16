@@ -50,7 +50,7 @@ export const CATEGORIES: { id: Category; label: string }[] = [
   { id: "riddle", label: "Énigme" },
 ];
 
-const API_URL =
+export const API_URL =
   process.env.DROPS_API_URL ?? "https://drops-api-production.up.railway.app";
 
 export async function fetchDrops(query: DropsQuery): Promise<DropPage> {
