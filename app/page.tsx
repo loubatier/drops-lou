@@ -1,157 +1,71 @@
 import Link from "next/link";
-import { Suspense } from "react";
+import { ArrowRightIcon, ActivityIcon } from "lucide-react";
+import { CATEGORIES } from "@/lib/drops";
+import { buttonVariants } from "@/components/ui/button";
 import {
-  CATEGORIES,
-  fetchDrops,
-  type Category,
-  type DropPage,
-  type Sort,
-} from "@/lib/drops";
-import { DropCard } from "./drops-list";
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-type Search = Record<string, string | string[] | undefined>;
+const CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  note: "Des messages laissés sur place.",
+  photo: "Des images prises au bon endroit.",
+  tip: "Les bons plans des gens du coin.",
+  riddle: "Des énigmes à résoudre sur le terrain.",
+};
 
-const first = (value: string | string[] | undefined) =>
-  Array.isArray(value) ? value[0] : value;
-
-export const metadata = { title: "Drops", description: "Liste des drops" };
-
-export default function Home({
-  searchParams,
-}: {
-  searchParams: Promise<Search>;
-}) {
+export default function Home() {
   return (
-    <Suspense
-      fallback={
-        <p className="mx-auto w-full max-w-3xl px-4 py-10 text-zinc-500">
-          Chargement…
+    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-16 px-4 py-16 sm:py-24">
+      <section className="flex flex-col items-start gap-6">
+        <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+          Des messages laissés quelque part, à découvrir.
+        </h1>
+        <p className="max-w-xl text-lg text-muted-foreground text-pretty">
+          Drops rassemble des notes, photos, astuces et énigmes géolocalisées.
+          Parcours les derniers drops ou cherche ceux qui t&apos;intéressent.
         </p>
-      }
-    >
-      <Drops searchParams={searchParams} />
-    </Suspense>
-  );
-}
+        <div className="flex flex-wrap gap-3">
+          <Link href="/drops" className={buttonVariants({ size: "lg" })}>
+            Explorer les drops
+            <ArrowRightIcon data-icon="inline-end" />
+          </Link>
+          <Link
+            href="/status"
+            className={buttonVariants({ variant: "outline", size: "lg" })}
+          >
+            <ActivityIcon data-icon="inline-start" />
+            Statut du service
+          </Link>
+        </div>
+      </section>
 
-async function Drops({
-  searchParams,
-}: {
-  searchParams: Promise<Search>;
-}) {
-  const sp = await searchParams;
-  const q = first(sp.q) ?? "";
-  const category = CATEGORIES.find((c) => c.id === first(sp.category))?.id;
-  const sort: Sort = first(sp.sort) === "popular" ? "popular" : "recent";
-  const page = Math.max(1, Number(first(sp.page)) || 1);
-
-  let data: DropPage | null = null;
-  let error: string | null = null;
-  try {
-    data = await fetchDrops({ q: q || undefined, category, sort, page });
-  } catch (e) {
-    error = e instanceof Error ? e.message : "Erreur inconnue";
-  }
-
-  const href = (next: { page?: number; category?: Category | "" }) => {
-    const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    const cat = next.category === undefined ? category : next.category;
-    if (cat) params.set("category", cat);
-    if (sort !== "recent") params.set("sort", sort);
-    if (next.page && next.page > 1) params.set("page", String(next.page));
-    const qs = params.toString();
-    return qs ? `/?${qs}` : "/";
-  };
-
-  return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-10">
-      <h1 className="text-3xl font-semibold tracking-tight">Drops</h1>
-      {data && (
-        <p className="mt-1 text-sm text-zinc-500">
-          {data.total} drop{data.total > 1 ? "s" : ""}
-        </p>
-      )}
-
-      <form className="mt-6 flex flex-wrap gap-2">
-        <input
-          type="search"
-          name="q"
-          defaultValue={q}
-          placeholder="Rechercher…"
-          className="min-w-0 flex-1 rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm dark:border-zinc-700"
-        />
-        {category && <input type="hidden" name="category" value={category} />}
-        <select
-          name="sort"
-          defaultValue={sort}
-          className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm dark:border-zinc-700"
-        >
-          <option value="recent">Récents</option>
-          <option value="popular">Populaires</option>
-        </select>
-        <button
-          type="submit"
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
-        >
-          Filtrer
-        </button>
-      </form>
-
-      <nav className="mt-4 flex flex-wrap gap-2">
-        {[{ id: "" as const, label: "Tous" }, ...CATEGORIES].map((c) => {
-          const active = (category ?? "") === c.id;
-          return (
-            <Link
-              key={c.id}
-              href={href({ category: c.id })}
-              className={`rounded-full border px-3 py-1 text-sm ${
-                active
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-                  : "border-zinc-300 dark:border-zinc-700"
-              }`}
-            >
-              {c.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {error && (
-        <p role="alert" className="mt-8 rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
-          {error}
-        </p>
-      )}
-
-      {data && data.items.length === 0 && (
-        <p className="mt-8 text-zinc-500">Aucun drop ne correspond.</p>
-      )}
-
-      {data && data.items.length > 0 && (
-        <ul className="mt-6 flex flex-col gap-4">
-          {data.items.map((drop) => (
-            <DropCard key={drop.id} drop={drop} />
+      <section className="flex flex-col gap-4" aria-labelledby="categories">
+        <h2 id="categories" className="text-xl font-semibold tracking-tight">
+          Parcourir par catégorie
+        </h2>
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {CATEGORIES.map((category) => (
+            <li key={category.id}>
+              <Link
+                href={`/drops?category=${category.id}`}
+                className="block h-full rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                <Card className="h-full transition-colors hover:bg-muted/50">
+                  <CardHeader>
+                    <CardTitle>{category.label}</CardTitle>
+                    <CardDescription>
+                      {CATEGORY_DESCRIPTIONS[category.id]}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+            </li>
           ))}
         </ul>
-      )}
-
-      {data && data.totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-between text-sm">
-          {data.page > 1 ? (
-            <Link href={href({ page: data.page - 1 })}>← Précédent</Link>
-          ) : (
-            <span />
-          )}
-          <span className="text-zinc-500">
-            Page {data.page} / {data.totalPages}
-          </span>
-          {data.page < data.totalPages ? (
-            <Link href={href({ page: data.page + 1 })}>Suivant →</Link>
-          ) : (
-            <span />
-          )}
-        </div>
-      )}
+      </section>
     </main>
   );
 }
