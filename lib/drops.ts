@@ -1,3 +1,6 @@
+import { api, ApiError } from "@/lib/api/client";
+import { authHeaders } from "@/lib/auth/session";
+
 export type Category = "note" | "photo" | "tip" | "riddle";
 export type Sort = "recent" | "popular";
 
@@ -50,18 +53,17 @@ export const CATEGORIES: { id: Category; label: string }[] = [
   { id: "riddle", label: "Énigme" },
 ];
 
-export const API_URL =
-  process.env.DROPS_API_URL ?? "https://drops-api-production.up.railway.app";
-
 export async function fetchDrops(query: DropsQuery): Promise<DropPage> {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(query)) {
-    if (value !== undefined && value !== "") params.set(key, String(value));
+  return api.get<DropPage>("/drops", { query, headers: await authHeaders() });
+}
+
+export async function fetchDrop(id: string): Promise<Drop | null> {
+  try {
+    return await api.get<Drop>(`/drops/${encodeURIComponent(id)}`, {
+      headers: await authHeaders(),
+    });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
   }
-  const res = await fetch(`${API_URL}/drops?${params}`, { cache: "no-store" });
-  if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.error?.message ?? `Erreur API (${res.status})`);
-  }
-  return res.json();
 }

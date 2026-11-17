@@ -1,4 +1,7 @@
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { CATEGORIES, type Drop } from "@/lib/drops";
+import { ExpandableContent } from "./expandable-content";
 
 const categoryLabel = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.label]));
 
@@ -28,9 +31,9 @@ export function DropCard({ drop }: { drop: Drop }) {
         </p>
       ) : (
         drop.content && (
-          <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
-            {drop.content}
-          </p>
+          <div className="mt-2">
+            <ExpandableContent content={drop.content} />
+          </div>
         )
       )}
       {drop.imageUrl && (
@@ -54,6 +57,13 @@ export function DropCard({ drop }: { drop: Drop }) {
           <span>💬 {drop.commentsCount}</span>
         </span>
       </div>
+      <Link
+        href={`/drops/${drop.id}`}
+        className="mt-4 inline-flex items-center gap-2 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm font-medium transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+      >
+        Voir le drop
+        <ArrowRight aria-hidden className="size-4" />
+      </Link>
     </li>
   );
 }
