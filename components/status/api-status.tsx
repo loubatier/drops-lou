@@ -5,7 +5,6 @@ import {
   XCircleIcon,
   type LucideIcon,
 } from "lucide-react";
-import { API_URL } from "@/lib/drops";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { api } from "@/lib/api/client";
 import { RefreshButton } from "./refresh-button";
 
 const SLOW_THRESHOLD_MS = 800;
@@ -72,10 +72,7 @@ async function checkHealth(): Promise<Check> {
   const checkedAt = new Date();
 
   try {
-    const res = await fetch(`${API_URL}/health`, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
+    const res = await api.raw("GET", "/health", { timeoutMs: TIMEOUT_MS });
     const latencyMs = Math.round(performance.now() - startedAt);
     const level: Level = !res.ok
       ? "down"
@@ -142,7 +139,7 @@ export async function ApiStatus() {
         <Separator />
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <Detail label="Endpoint">
-            <span title={`${API_URL}/health`}>{new URL(API_URL).host}</span>
+            <span title={api.url("/health")}>{new URL(api.url("/health")).host}</span>
           </Detail>
           <Detail label="Code HTTP">{check.httpStatus ?? "—"}</Detail>
           <Detail label="Latence">
