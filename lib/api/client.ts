@@ -1,12 +1,19 @@
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string | null;
+  readonly fields: Record<string, string[]>;
 
-  constructor(status: number, message: string, code: string | null = null) {
+  constructor(
+    status: number,
+    message: string,
+    code: string | null = null,
+    fields: Record<string, string[]> = {},
+  ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
+    this.fields = fields;
   }
 }
 
@@ -83,6 +90,7 @@ async function toApiError(res: Response): Promise<ApiError> {
     res.status,
     body?.error?.message ?? `Erreur API (${res.status})`,
     body?.error?.code ?? null,
+    body?.error?.fields ?? {},
   );
 }
 
