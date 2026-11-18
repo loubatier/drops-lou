@@ -2,8 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { api, ApiError } from "@/lib/api/client";
-
-const COOKIE_NAME = "drops_token";
+import { COOKIE_NAME } from "@/lib/auth/cookie";
 
 export type User = {
   id: number;

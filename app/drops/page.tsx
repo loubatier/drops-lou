@@ -1,4 +1,6 @@
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import {
   CATEGORIES,
@@ -33,27 +35,43 @@ async function Drops({
   const q = first(sp.q) ?? "";
   const category = CATEGORIES.find((c) => c.id === first(sp.category))?.id;
   const sort: Sort = first(sp.sort) === "popular" ? "popular" : "recent";
+  const requestedPage = Number(first(sp.page));
+  const page =
+    Number.isInteger(requestedPage) && requestedPage > 1 ? requestedPage : 1;
 
-  const href = (next: { category?: Category | "" }) => {
+  const href = (next: { category?: Category | ""; page?: number }) => {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
     const cat = next.category === undefined ? category : next.category;
     if (cat) params.set("category", cat);
     if (sort !== "recent") params.set("sort", sort);
+    if (next.page && next.page > 1) params.set("page", String(next.page));
     const qs = params.toString();
     return qs ? `/drops?${qs}` : "/drops";
   };
 
   if (sp.q === "") redirect(href({}));
 
-  const data = await fetchDrops({ q: q || undefined, category, sort });
+  const data = await fetchDrops({ q: q || undefined, category, sort, page });
+  if (data.totalPages > 0 && page > data.totalPages) {
+    redirect(href({ page: data.totalPages }));
+  }
+  const filtered = Boolean(q || category);
 
   return (
     <>
-      <h1 className="text-3xl font-semibold tracking-tight">Drops</h1>
-      <p className="mt-1 text-sm text-zinc-500">
-        {data.total} drop{data.total > 1 ? "s" : ""}
-      </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">Drops</h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            {data.total} drop{data.total > 1 ? "s" : ""}
+          </p>
+        </div>
+        <Link href="/drops/new" className={buttonVariants()}>
+          <PlusIcon data-icon="inline-start" />
+          Nouveau drop
+        </Link>
+      </div>
 
       <DropsFilters q={q} category={category} sort={sort} />
 
@@ -77,7 +95,22 @@ async function Drops({
       </nav>
 
       {data.items.length === 0 && (
-        <p className="mt-8 text-zinc-500">Aucun drop ne correspond.</p>
+        <div className="mt-8 flex flex-col items-start gap-3 rounded-xl border border-dashed p-8 text-zinc-500">
+          <p>
+            {filtered
+              ? "Aucun drop ne correspond à ta recherche."
+              : "Aucun drop pour le moment. Sois le premier à en déposer un."}
+          </p>
+          {filtered ? (
+            <Link href="/drops" className={buttonVariants({ variant: "outline" })}>
+              Réinitialiser les filtres
+            </Link>
+          ) : (
+            <Link href="/drops/new" className={buttonVariants()}>
+              Créer un drop
+            </Link>
+          )}
+        </div>
       )}
 
       {data.items.length > 0 && (
@@ -86,6 +119,39 @@ async function Drops({
             <DropCard key={drop.id} drop={drop} />
           ))}
         </ul>
+      )}
+
+      {data.totalPages > 1 && (
+        <nav
+          aria-label="Pagination"
+          className="mt-8 flex items-center justify-between gap-3 text-sm"
+        >
+          {page > 1 ? (
+            <Link
+              href={href({ page: page - 1 })}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <ChevronLeftIcon data-icon="inline-start" />
+              Précédent
+            </Link>
+          ) : (
+            <span />
+          )}
+          <span className="text-zinc-500">
+            Page {page} sur {data.totalPages}
+          </span>
+          {page < data.totalPages ? (
+            <Link
+              href={href({ page: page + 1 })}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Suivant
+              <ChevronRightIcon data-icon="inline-end" />
+            </Link>
+          ) : (
+            <span />
+          )}
+        </nav>
       )}
     </>
   );

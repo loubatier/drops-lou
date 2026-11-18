@@ -49,7 +49,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -530,7 +530,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -660,7 +660,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -708,7 +708,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -792,7 +792,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -815,7 +815,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -910,7 +910,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -933,7 +933,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1049,7 +1049,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1097,7 +1097,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1194,7 +1194,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1238,7 +1238,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1340,11 +1340,34 @@ export interface paths {
                         "application/json": components["schemas"]["Category"][];
                     };
                 };
+                /** @description Token absent, invalide, expiré ou révoqué (`unauthorized`, `invalid_token`, `token_expired`, `token_revoked`, `invalid_credentials`). */
+                401: {
+                    headers: {
+                        /** @description Toujours `Bearer`. */
+                        "WWW-Authenticate"?: string;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        /**
+                         * @example {
+                         *       "error": {
+                         *         "status": 401,
+                         *         "code": "unauthorized",
+                         *         "message": "Authentification requise.",
+                         *         "fields": {},
+                         *         "requestId": "req_8f2c1a3b",
+                         *         "simulated": false
+                         *       }
+                         *     }
+                         */
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
                 /** @description Trop de requêtes (`rate_limited`), voir `Retry-After`. */
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1403,7 +1426,7 @@ export interface paths {
         };
         /**
          * Lister les drops
-         * @description Liste paginée des drops, du plus récent au plus ancien par défaut. Les drops masqués sont exclus. Le token est facultatif : il alimente `likedByMe` et `isMine`.
+         * @description Liste paginée des drops, du plus récent au plus ancien par défaut. Les drops masqués sont exclus. Token requis : il alimente `likedByMe` et `isMine`.
          */
         get: {
             parameters: {
@@ -1474,7 +1497,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1522,7 +1545,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1599,7 +1622,7 @@ export interface paths {
                 201: {
                     headers: {
                         /** @description Chemin du drop créé, par exemple `/drops/42`. */
-                        Location?: unknown;
+                        Location?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1661,7 +1684,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1709,7 +1732,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1825,7 +1848,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1869,7 +1892,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -1944,7 +1967,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2009,7 +2032,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2147,7 +2170,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2237,7 +2260,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2327,7 +2350,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2371,7 +2394,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2450,7 +2473,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2494,7 +2517,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2604,7 +2627,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2673,7 +2696,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2789,7 +2812,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2858,7 +2881,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -2945,7 +2968,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -3010,7 +3033,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -3134,7 +3157,7 @@ export interface paths {
                 401: {
                     headers: {
                         /** @description Toujours `Bearer`. */
-                        "WWW-Authenticate"?: unknown;
+                        "WWW-Authenticate"?: string;
                         [name: string]: unknown;
                     };
                     content: {
@@ -3224,7 +3247,7 @@ export interface paths {
                 429: {
                     headers: {
                         /** @description Secondes à attendre. */
-                        "Retry-After"?: unknown;
+                        "Retry-After"?: string;
                         [name: string]: unknown;
                     };
                     content: {

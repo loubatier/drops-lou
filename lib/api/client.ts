@@ -2,18 +2,21 @@ export class ApiError extends Error {
   readonly status: number;
   readonly code: string | null;
   readonly fields: Record<string, string[]>;
+  readonly retryAfter: number | null;
 
   constructor(
     status: number,
     message: string,
     code: string | null = null,
     fields: Record<string, string[]> = {},
+    retryAfter: number | null = null,
   ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
     this.fields = fields;
+    this.retryAfter = retryAfter;
   }
 }
 
@@ -91,7 +94,13 @@ async function toApiError(res: Response): Promise<ApiError> {
     body?.error?.message ?? `Erreur API (${res.status})`,
     body?.error?.code ?? null,
     body?.error?.fields ?? {},
+    parseRetryAfter(res.headers.get("Retry-After")),
   );
+}
+
+function parseRetryAfter(value: string | null): number | null {
+  const seconds = Number(value);
+  return value && Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds) : null;
 }
 
 function resolveBaseUrl(): string {
