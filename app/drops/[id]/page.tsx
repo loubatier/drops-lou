@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Presence } from "@/components/drops/presence";
 import { CATEGORIES, fetchDrop } from "@/lib/drops";
 
 const categoryLabel = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.label]));
@@ -58,6 +59,7 @@ async function DropDetail({ params }: { params: Promise<{ id: string }> }) {
           {drop.author.displayName}
         </span>
       </p>
+      <Presence dropId={drop.id} />
       {drop.locked ? (
         <p className="mt-4 italic text-zinc-500">
           Drop verrouillé : rapproche-toi pour l&apos;ouvrir.
