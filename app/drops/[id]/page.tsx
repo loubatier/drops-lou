@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { LikeButton } from "@/components/drops/like-button";
 import { Presence } from "@/components/drops/presence";
 import { CATEGORIES, fetchDrop } from "@/lib/drops";
 
@@ -79,7 +80,17 @@ async function DropDetail({ params }: { params: Promise<{ id: string }> }) {
         />
       )}
       <dl className="mt-6 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-        <Stat label="Likes" value={`${drop.likedByMe ? "♥" : "♡"} ${drop.likesCount}`} />
+        <Stat
+          label="Likes"
+          value={
+            <LikeButton
+              dropId={drop.id}
+              initialLiked={drop.likedByMe}
+              initialCount={drop.likesCount}
+              className="-ml-2.5 -my-1"
+            />
+          }
+        />
         <Stat label="Commentaires" value={drop.commentsCount} />
         <Stat label="Ouvertures" value={drop.opensCount} />
         <Stat
@@ -93,7 +104,7 @@ async function DropDetail({ params }: { params: Promise<{ id: string }> }) {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string | number }) {
+function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-800">
       <dt className="text-xs text-zinc-500 dark:text-zinc-400">{label}</dt>
