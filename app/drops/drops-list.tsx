@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { LikeButton } from "@/components/drops/like-button";
 import { CATEGORIES, type Drop } from "@/lib/drops";
 import { ExpandableContent } from "./expandable-content";
 
@@ -52,8 +53,12 @@ export function DropCard({ drop }: { drop: Drop }) {
           · {drop.location.lat.toFixed(4)}, {drop.location.lng.toFixed(4)}
           {drop.location.precision === "approx" && " (approx.)"}
         </span>
-        <span className="flex gap-3">
-          <span>{drop.likedByMe ? "♥" : "♡"} {drop.likesCount}</span>
+        <span className="flex items-center gap-3">
+          <LikeButton
+            dropId={drop.id}
+            initialLiked={drop.likedByMe}
+            initialCount={drop.likesCount}
+          />
           <span>💬 {drop.commentsCount}</span>
         </span>
       </div>
