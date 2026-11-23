@@ -13,7 +13,7 @@ const dateFormat = new Intl.DateTimeFormat("fr-FR", {
 
 export function DropCard({ drop }: { drop: Drop }) {
   return (
-    <li className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
       <div className="flex items-center justify-between gap-3">
         <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium dark:bg-zinc-800">
           {categoryLabel[drop.category]}
@@ -69,6 +69,6 @@ export function DropCard({ drop }: { drop: Drop }) {
         Voir le drop
         <ArrowRight aria-hidden className="size-4" />
       </Link>
-    </li>
+    </div>
   );
 }

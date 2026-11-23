@@ -10,10 +10,12 @@ export default function Error({
   retry: () => void;
 }) {
   return (
-    <RouteError
-      error={error}
-      retry={retry}
-      title="Impossible de charger les drops"
-    />
+    <div className="mx-auto w-full max-w-3xl px-4 py-10">
+      <RouteError
+        error={error}
+        retry={retry}
+        title="Impossible de charger les drops"
+      />
+    </div>
   );
 }

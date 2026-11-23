@@ -6,9 +6,13 @@ import {
   type Category,
   type Sort,
 } from "@/lib/drops";
+import { DropDialog } from "@/components/drops/drop-dialog";
 import { LiveDropsRefresh } from "@/components/realtime/live-refresh";
 import { DropCard } from "./drops-list";
 import { DropsFilters } from "./drops-filters";
+import { DropsExplorer } from "./drops-explorer";
+import { Button } from "@/components/ui/button";
+import { getCurrentUser } from "@/lib/auth/session";
 
 type Search = Record<string, string | string[] | undefined>;
 
@@ -47,15 +51,26 @@ async function Drops({
 
   if (sp.q === "") redirect(href({}));
 
-  const data = await fetchDrops({ q: q || undefined, category, sort });
+  const [data, user] = await Promise.all([
+    fetchDrops({ q: q || undefined, category, sort }),
+    getCurrentUser(),
+  ]);
 
-  return (
+  const header = (
     <>
-      <LiveDropsRefresh />
-      <h1 className="text-3xl font-semibold tracking-tight">Drops</h1>
-      <p className="mt-1 text-sm text-zinc-500">
-        {data.total} drop{data.total > 1 ? "s" : ""}
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">Drops</h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            {data.total} drop{data.total > 1 ? "s" : ""}
+          </p>
+        </div>
+        {user ? (
+          <DropDialog />
+        ) : (
+          <Button render={<Link href="/login" />}>Se connecter pour créer</Button>
+        )}
+      </div>
 
       <DropsFilters q={q} category={category} sort={sort} />
 
@@ -77,18 +92,19 @@ async function Drops({
           );
         })}
       </nav>
+    </>
+  );
 
-      {data.items.length === 0 && (
-        <p className="mt-8 text-zinc-500">Aucun drop ne correspond.</p>
-      )}
-
-      {data.items.length > 0 && (
-        <ul className="mt-6 flex flex-col gap-4">
-          {data.items.map((drop) => (
-            <DropCard key={drop.id} drop={drop} />
-          ))}
-        </ul>
-      )}
+  return (
+    <>
+      <LiveDropsRefresh />
+      <DropsExplorer
+        header={header}
+        drops={data.items}
+        cards={data.items.map((drop) => (
+          <DropCard key={drop.id} drop={drop} />
+        ))}
+      />
     </>
   );
 }

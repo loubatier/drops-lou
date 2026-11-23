@@ -1,7 +1,9 @@
 import { api, ApiError } from "@/lib/api/client";
 import { authHeaders } from "@/lib/auth/session";
+import type { Category } from "@/lib/drop-categories";
 
-export type Category = "note" | "photo" | "tip" | "riddle";
+export { CATEGORIES, type Category } from "@/lib/drop-categories";
+
 export type Sort = "recent" | "popular";
 
 export type Drop = {
@@ -45,13 +47,6 @@ export type DropsQuery = {
   author?: string;
   sort?: Sort;
 };
-
-export const CATEGORIES: { id: Category; label: string }[] = [
-  { id: "note", label: "Note" },
-  { id: "photo", label: "Photo" },
-  { id: "tip", label: "Astuce" },
-  { id: "riddle", label: "Énigme" },
-];
 
 export async function fetchDrops(query: DropsQuery): Promise<DropPage> {
   return api.get<DropPage>("/drops", { query, headers: await authHeaders() });

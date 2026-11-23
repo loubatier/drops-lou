@@ -6,6 +6,8 @@ import { Comments, CommentsSkeleton } from "@/components/drops/comments";
 import { LikeButton } from "@/components/drops/like-button";
 import { LiveDropRefresh } from "@/components/realtime/live-refresh";
 import { LiveOpens } from "@/components/realtime/live-opens";
+import { DropDialog } from "@/components/drops/drop-dialog";
+import { DropMap } from "@/components/map/drop-map";
 import { Presence } from "@/components/drops/presence";
 import { CATEGORIES, fetchDrop } from "@/lib/drops";
 
@@ -67,9 +69,12 @@ async function DropDetail({
             {dateFormat.format(new Date(drop.createdAt))}
           </time>
         </div>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight">
-          {drop.title}
-        </h1>
+        <div className="mt-3 flex items-start justify-between gap-3">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            {drop.title}
+          </h1>
+          {drop.isMine && <DropDialog drop={drop} />}
+        </div>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           par{" "}
           <span className="font-medium text-zinc-800 dark:text-zinc-200">
@@ -116,6 +121,20 @@ async function DropDetail({
             }`}
           />
         </dl>
+        <div className="mt-6 h-56 overflow-hidden rounded-xl border">
+          <DropMap
+            label="Position du drop"
+            pins={[
+              {
+                id: drop.id,
+                title: drop.title,
+                lat: drop.location.lat,
+                lng: drop.location.lng,
+              },
+            ]}
+            highlightedId={drop.id}
+          />
+        </div>
       </article>
       <Suspense fallback={<CommentsSkeleton />}>
         <Comments dropId={drop.id} page={commentsPage} />
