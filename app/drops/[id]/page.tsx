@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Comments, CommentsSkeleton } from "@/components/drops/comments";
 import { LikeButton } from "@/components/drops/like-button";
+import { LiveDropRefresh } from "@/components/realtime/live-refresh";
+import { LiveOpens } from "@/components/realtime/live-opens";
 import { Presence } from "@/components/drops/presence";
 import { CATEGORIES, fetchDrop } from "@/lib/drops";
 
@@ -52,6 +54,7 @@ async function DropDetail({
 
   return (
     <>
+      <LiveDropRefresh dropId={drop.id} />
       <article className="mt-6">
         <div className="flex items-center justify-between gap-3">
           <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium dark:bg-zinc-800">
@@ -105,7 +108,7 @@ async function DropDetail({
             }
           />
           <Stat label="Commentaires" value={drop.commentsCount} />
-          <Stat label="Ouvertures" value={drop.opensCount} />
+          <Stat label="Ouvertures" value={<LiveOpens dropId={drop.id} initialCount={drop.opensCount} />} />
           <Stat
             label="Position"
             value={`${drop.location.lat.toFixed(4)}, ${drop.location.lng.toFixed(4)}${

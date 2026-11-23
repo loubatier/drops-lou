@@ -4,6 +4,7 @@ import { SendIcon } from "lucide-react";
 import { useActionState, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { addComment, type CommentFormState } from "@/lib/comments-actions";
 import { COMMENT_MAX_LENGTH } from "@/lib/comment-limits";
 import { cn } from "@/lib/utils";
@@ -31,7 +32,7 @@ export function CommentForm({ dropId }: { dropId: number }) {
       <label htmlFor="comment-content" className="sr-only">
         Ton commentaire
       </label>
-      <textarea
+      <Textarea
         id="comment-content"
         name="content"
         key={state.posted ?? 0}
@@ -41,7 +42,7 @@ export function CommentForm({ dropId }: { dropId: number }) {
         maxLength={COMMENT_MAX_LENGTH}
         placeholder="Ajoute un commentaire…"
         required
-        className="w-full resize-y rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+        className="resize-y"
       />
       <div className="flex items-center justify-between gap-3">
         <span

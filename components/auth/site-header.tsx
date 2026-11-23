@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { RealtimeStatus } from "@/components/realtime/realtime-status";
 import { UserMenu, UserMenuFallback } from "@/components/auth/user-menu";
 
 export function SiteHeader() {
@@ -9,9 +10,12 @@ export function SiteHeader() {
         <Link href="/" className="text-base font-semibold tracking-tight">
           Drops
         </Link>
-        <Suspense fallback={<UserMenuFallback />}>
-          <UserMenu />
-        </Suspense>
+        <div className="flex items-center gap-4">
+          <RealtimeStatus />
+          <Suspense fallback={<UserMenuFallback />}>
+            <UserMenu />
+          </Suspense>
+        </div>
       </div>
     </header>
   );

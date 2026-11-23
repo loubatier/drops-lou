@@ -3,6 +3,8 @@
 import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import { useRealtimeEvent } from "@/hooks/use-realtime-event";
 import { setLike } from "@/lib/drops-actions";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +33,12 @@ export function LikeButton({
     (_current, next: State) => next,
   );
   const [error, setError] = useState<string | null>(null);
+
+  useRealtimeEvent("like:updated", (data) => {
+    if (data.dropId === dropId) {
+      setConfirmed((current) => ({ ...current, count: data.likesCount }));
+    }
+  });
   const [, startTransition] = useTransition();
 
   const toggle = () => {
@@ -59,13 +67,14 @@ export function LikeButton({
 
   return (
     <span className="inline-flex items-center gap-2">
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={toggle}
         aria-pressed={optimistic.liked}
         aria-label={optimistic.liked ? "Retirer le like" : "Liker ce drop"}
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800",
+          "rounded-full",
           className,
         )}
       >
@@ -77,7 +86,7 @@ export function LikeButton({
           )}
         />
         <span className="tabular-nums">{optimistic.count}</span>
-      </button>
+      </Button>
       {error && (
         <span role="alert" className="text-xs text-red-600">
           {error}

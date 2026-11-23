@@ -2,6 +2,7 @@
 
 import { ChevronDown } from "lucide-react";
 import { useId, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export function ExpandableContent({ content }: { content: string }) {
   const [open, setOpen] = useState(false);
@@ -9,19 +10,19 @@ export function ExpandableContent({ content }: { content: string }) {
 
   return (
     <div>
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls={id}
-        className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-medium transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
       >
         <ChevronDown
           aria-hidden
           className={`size-4 transition-transform ${open ? "rotate-180" : ""}`}
         />
         {open ? "Masquer le contenu" : "Afficher le contenu"}
-      </button>
+      </Button>
       <p
         id={id}
         hidden={!open}

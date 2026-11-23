@@ -1,95 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRealtimeEvent } from "@/hooks/use-realtime-event";
+import { useRealtimeStatus } from "@/hooks/use-realtime-status";
+import {
+  onOpen,
+  retain,
+  send,
+  subscribe,
+  type ConnectionStatus,
+  type Viewer,
+} from "@/lib/realtime";
 
-export type Viewer = {
-  id: number;
-  username: string;
-  displayName: string;
-  avatarUrl: string | null;
-};
-
-export type PresenceStatus = "connecting" | "live" | "reconnecting" | "offline";
-
-type ServerMessage =
-  | { type: "hello"; data: { user: Viewer } }
-  | { type: "presence:drop"; data: { dropId: number; viewers: Viewer[] } };
-
-const NO_RECONNECT = [4001, 4008, 4009];
-const MAX_DELAY_MS = 15000;
+export type { Viewer };
+export type PresenceStatus = ConnectionStatus;
 
 export function usePresence(dropId: number) {
   const [viewers, setViewers] = useState<Viewer[]>([]);
+  const [loadedFor, setLoadedFor] = useState<number | null>(null);
   const [selfId, setSelfId] = useState<number | null>(null);
-  const [status, setStatus] = useState<PresenceStatus>("connecting");
+  const connection = useRealtimeStatus();
+
+  useRealtimeEvent("hello", (data) => setSelfId(data.user.id), { replay: true });
 
   useEffect(() => {
-    let socket: WebSocket | null = null;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let attempt = 0;
-    let stopped = false;
-
-    function scheduleReconnect() {
-      attempt += 1;
-      setStatus("reconnecting");
-      timer = setTimeout(connect, Math.min(1000 * 2 ** attempt, MAX_DELAY_MS));
-    }
-
-    async function connect() {
-      let url: string;
-      try {
-        const res = await fetch("/api/realtime/ticket", { method: "POST" });
-        if (stopped) return;
-        if (res.status === 401) return setStatus("offline");
-        if (!res.ok) return scheduleReconnect();
-        ({ url } = await res.json());
-      } catch {
-        if (!stopped) scheduleReconnect();
-        return;
-      }
-      if (stopped) return;
-
-      const ws = new WebSocket(url);
-      socket = ws;
-
-      ws.onopen = () => {
-        attempt = 0;
-        ws.send(JSON.stringify({ type: "presence:view", data: { dropId } }));
-      };
-
-      ws.onmessage = (event) => {
-        let message: ServerMessage;
-        try {
-          message = JSON.parse(event.data);
-        } catch {
-          return;
-        }
-        if (message.type === "hello") {
-          setSelfId(message.data.user.id);
-        } else if (
-          message.type === "presence:drop" &&
-          message.data.dropId === dropId
-        ) {
-          setViewers(message.data.viewers);
-          setStatus("live");
-        }
-      };
-
-      ws.onclose = (event) => {
-        if (stopped || socket !== ws) return;
-        if (NO_RECONNECT.includes(event.code)) return setStatus("offline");
-        scheduleReconnect();
-      };
-    }
-
-    connect();
-
+    const release = retain();
+    const offOpen = onOpen(() => send("presence:view", { dropId }));
+    const off = subscribe("presence:drop", (data) => {
+      if (data.dropId !== dropId) return;
+      setViewers(data.viewers);
+      setLoadedFor(dropId);
+    });
     return () => {
-      stopped = true;
-      clearTimeout(timer);
-      socket?.close(1000);
+      off();
+      offOpen();
+      send("presence:leave");
+      release();
     };
   }, [dropId]);
+
+  const status: PresenceStatus =
+    connection === "live" && loadedFor !== dropId ? "connecting" : connection;
 
   return { viewers, selfId, status };
 }

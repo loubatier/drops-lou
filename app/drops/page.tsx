@@ -6,6 +6,7 @@ import {
   type Category,
   type Sort,
 } from "@/lib/drops";
+import { LiveDropsRefresh } from "@/components/realtime/live-refresh";
 import { DropCard } from "./drops-list";
 import { DropsFilters } from "./drops-filters";
 
@@ -50,6 +51,7 @@ async function Drops({
 
   return (
     <>
+      <LiveDropsRefresh />
       <h1 className="text-3xl font-semibold tracking-tight">Drops</h1>
       <p className="mt-1 text-sm text-zinc-500">
         {data.total} drop{data.total > 1 ? "s" : ""}
